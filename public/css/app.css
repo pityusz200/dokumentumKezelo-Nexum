@@ -1,0 +1,68 @@
+.margo{
+    width: 50%;
+    margin: 10px auto;
+}
+
+.clear{
+    clear: left;
+}
+
+.margoButton{
+    margin: 10px;
+}
+
+.margoButton{
+    margin: 0px 0px 10px 0px;
+}
+
+.margoButton_Pen{
+    margin: 0px 10px 10px -3px;
+}
+
+.buttonsDiv{
+    width: 200px;
+    margin: 0px;
+    display: flex;
+    float: left;
+}
+
+.margoModal{
+    width: 80%;
+    margin: 10px auto;
+}
+
+table, th, td {
+    width: 40%;
+    border: 1px solid black;
+    border-collapse: collapse;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.center{
+    text-align: center;
+}
+
+.editPen{
+    width: 20px;
+}
+
+.callout{
+    margin: 0px;
+}
+
+.unsuccessful{
+    background-color: rgba(255, 103, 103, 0.87);
+}
+
+.nevLeiras p{
+    line-height: 10px;
+    font-size: 15px;
+    margin: 10px;
+}
+
+.nevLeiras{
+    background-color: rgba(206, 206, 206, 0.657);
+    padding: 10px;
+    margin: 10px auto;
+}
