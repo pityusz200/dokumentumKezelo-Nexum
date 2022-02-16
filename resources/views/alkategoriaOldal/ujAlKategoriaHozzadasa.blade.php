@@ -3,6 +3,7 @@
 @section('tartalom')
 
    <div class="callout large primary">
+    <div class="melyikfokategoria"><h5><?php echo $fokategoriaNeve; ?></h5></div>
       <div class="row column text-center">
         <h1>Dokument Kezelő, Nexum</h1>
       </div>

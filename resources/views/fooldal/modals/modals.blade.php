@@ -25,6 +25,12 @@
   
             <!-- Vége -->
             <!-- Törlés form-->
+
+            <div class="nevLeiras">
+              <p>A kategoriának nagybetűvel kell kezdődnie</p>
+              <p>A névnek legalább 3 karakter hosszúságúnak kell lennie!</p>
+              <p>A névnek számmal kell végződnie!</p>
+            </div>
   
           <div class="margoModal">
             {!! Form::open([  'action' => 'foKategoriakController@foKtorles', 

@@ -50,7 +50,7 @@ class foKategoriakController extends Controller
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Nincs megadva kategoria név!');;
         }
 
-        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $nev)){
+        if(!preg_match("/^[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $nev)){
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
@@ -104,7 +104,7 @@ class foKategoriakController extends Controller
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Nincs megadva új fő kategoria név!');;
         }
 
-        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $ujNev)){
+        if(!preg_match("/^[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $ujNev)){
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
@@ -186,6 +186,7 @@ class foKategoriakController extends Controller
         }
 
         $path = public_path().'/'.'fajlok/'.$fokategoriaNeve;
+        
         //Fokategoria mappájának törlése
         if(file_exists($path)){
             rmdir($path);

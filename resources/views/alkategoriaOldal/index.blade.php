@@ -3,10 +3,12 @@
 @section('tartalom')
 
     <div class="callout large primary">
+      <div class="melyikfokategoria"><h5><?php echo $fokategoriaNeve; ?></h5></div>
       <div class="row column text-center">
         <h1>Dokumentum Kezelő, Nexum</h1>
       </div>
       
+
       @for($i = 0; $i < count($hozzaTartozoAlkategoriaNevek);$i++)
         <div class="buttonsDiv">
           <button type="button" 

@@ -19,6 +19,9 @@ class alkategoriakController extends Controller
             $jogosultsagok->jogosultsagFelT = 0;
             $jogosultsagok->jogosultsagLetT = 0;
 
+            $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+            $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+
             if(Auth::check()){
                 $jog = DB::table('users')->where('email', Auth::user()->email)->get();
                 $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
@@ -27,7 +30,7 @@ class alkategoriakController extends Controller
 
             require_once('alKBetolto.php');
 
-            return view('alkategoriaOldal/index', compact('hozzaTartozoAlkategoriaNevek', 'foKategoria', 'jogosultsagok'));
+            return view('alkategoriaOldal/index', compact('hozzaTartozoAlkategoriaNevek','fokategoriaNeve', 'foKategoria', 'jogosultsagok'));
     }
 
     public function fajlFeltolto(Request $request){
@@ -158,7 +161,7 @@ class alkategoriakController extends Controller
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategoria név!');;
         }
 
-        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $nev)){
+        if(!preg_match("/^[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $nev)){
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
@@ -196,7 +199,9 @@ class alkategoriakController extends Controller
     }
 
 	public function ujAlKategoriaHozzadasaTov($foKategoria){
-        return view('alkategoriaOldal/ujAlKategoriaHozzadasa', compact('foKategoria'));
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+        return view('alkategoriaOldal/ujAlKategoriaHozzadasa', compact('foKategoria', 'fokategoriaNeve'));
     }
 
     public function modals($foKategoria, $alKategoria){
@@ -220,22 +225,12 @@ class alkategoriakController extends Controller
             $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
         }
 
-        require_once('alKBetolto.php');
-
-        $fajlok_id = array();
-
-        for ($i=0; $i < count($hozzaTartozoAlkategoriaNevek); $i++) { 
-            $aktualisID = DB::table('alkfajlkapocs_table')->where('AlK_id', $hozzaTartozoAlkategoriaNevek[$i]->id)->select('Fajl_id')->get();
-            if(isset($aktualisID[0]->Fajl_id)){
-                array_push($fajlok_id, $aktualisID[0]->Fajl_id);
-            }
-        }
-        
+        $fajlok_id = DB::table('alkfajlkapocs_table')->where('AlK_id', $alKategoria)->select('Fajl_id')->get();
         $hozzaTartozoFileNevek = array(); 
 
         for ($i=0; $i < count($fajlok); $i++) {
-            for ($j=0; $j < count($fajlok_id); $j++) { 
-                if($fajlok[$i]->id == $fajlok_id[$j]){
+            for ($j=0; $j < count($fajlok_id); $j++) {
+                if($fajlok[$i]->id == $fajlok_id[$j]->Fajl_id){
                     array_push($hozzaTartozoFileNevek, $fajlok[$i]);
                 }
             }
@@ -315,7 +310,7 @@ class alkategoriakController extends Controller
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategoria név!');;
         }
 
-        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $ujNev)){
+        if(!preg_match("/^[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $ujNev)){
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 

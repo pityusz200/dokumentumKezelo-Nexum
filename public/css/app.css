@@ -63,3 +63,13 @@ table, th, td {
     padding: 10px;
     margin: 10px auto;
 }
+
+.melyikfokategoria{
+    background-color:rgba(159, 215, 241, 0.109);
+    padding: 5px;
+    border-style: outset;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    text-align: center;
+}
