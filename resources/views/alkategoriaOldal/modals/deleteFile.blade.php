@@ -11,7 +11,7 @@
           {!! Form::open([  'action' => 'alkategoriakController@deleteFile', 
           'enctype' => 'multipart/form-data' , 'method' => 'POST' ]) !!}
             
-            <h5>Bíztos szeretné törölni ezt a fájlt?: {{$fajlNev}}</h5>
+            <h5>Biztos szeretné törölni ezt a fájlt?: {{$fajlNev}}</h5>
               <div class="center">
                   {!! Form::submit('Fájl törlése', $attributes=['class'=>'btn btn-danger'])!!}
               </div>

@@ -1,6 +1,6 @@
     function getText(text) {
       //Nagybetűvel kezdődik
-      const regexnBetu = new RegExp(/[A-Z-ÁÉÍÓÖŐÚÜŰ]/);  
+      const regexnBetu = new RegExp(/[A-ZÁÉÍÓÖŐÚÜŰ]/);  
       if(regexnBetu.test(text.value)){
         document.getElementById('nBetu').style.color = "#1ab012";
       }else{

@@ -30,7 +30,7 @@
       <div class="center">
         @if(Auth::check())
           @if($jogosultsagok->jogosultsagFelT == 1)
-            <a href="/ujFoKategoriaHozzadasa"><button type="button" class="btn btn-primary margo">Új kategoria hozzáadása</button></a>
+            <a href="/ujFoKategoriaHozzadasa"><button type="button" class="btn btn-primary margo">Új fő kategória hozzáadása</button></a>
           @endif
         @endif
       </div>

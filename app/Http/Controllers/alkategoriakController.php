@@ -14,13 +14,13 @@ class Jogosultsagok{
 class alkategoriakController extends Controller
 {
     public function index($foKategoria){
+            $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+            $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+        
             //Jogosultság
             $jogosultsagok = new Jogosultsagok;
             $jogosultsagok->jogosultsagFelT = 0;
             $jogosultsagok->jogosultsagLetT = 0;
-
-            $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
-            $fokategoriaNeve = $fokategoriaNeve[0]->nev;
 
             if(Auth::check()){
                 $jog = DB::table('users')->where('email', Auth::user()->email)->get();
@@ -40,19 +40,17 @@ class alkategoriakController extends Controller
         $alKategoria = $request->input('alKategoria');
         $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
         $fokategoriaNeve = $fokategoriaNeve[0]->nev;
-        
+    
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
         $jogosultsagok->jogosultsagFelT = 0;
         $jogosultsagok->jogosultsagLetT = 0;
+
         if(Auth::check()){
             $jog = DB::table('users')->where('email', Auth::user()->email)->get();
             $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
             $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
         }
-
-        //AlKategoriak visszatöltése
-        require_once('alKBetolto.php');
 
         //Validálás
         if(!isset($nev)){
@@ -143,27 +141,17 @@ class alkategoriakController extends Controller
         $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
         $fokategoriaNeve = $fokategoriaNeve[0]->nev;
 
-        //Jogosultság
-        $jogosultsagok = new Jogosultsagok;
-        $jogosultsagok->jogosultsagFelT = 0;
-        $jogosultsagok->jogosultsagLetT = 0;
-        if(Auth::check()){
-            $jog = DB::table('users')->where('email', Auth::user()->email)->get();
-            $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
-            $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
-        }
-
-        //AlKategoriak visszatöltése
-        require_once('alKBetolto.php');
 
         //Validálás
         if(!isset($nev)){
-            return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategoria név!');;
+            return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategória név!');;
         }
 
-        if(!preg_match("/^[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $nev)){
+        if(!preg_match("/^[A-ZÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $nev)){
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
+
+        require_once('alKBetolto.php');
 
         //Név ellenőrzése, hogy létezik-e még ilyen nevű
         for ($i=0; $i < count($hozzaTartozoAlkategoriaNevek); $i++) {
@@ -195,7 +183,7 @@ class alkategoriakController extends Controller
             File::makeDirectory($path);
         }
 
-        return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('uzenet', 'Új kategoria sikeresen hozzá adva!');
+        return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('uzenet', 'Új kategória sikeresen hozzá adva!');
     }
 
 	public function ujAlKategoriaHozzadasaTov($foKategoria){
@@ -219,6 +207,7 @@ class alkategoriakController extends Controller
         $jogosultsagok = new Jogosultsagok;
         $jogosultsagok->jogosultsagFelT = 0;
         $jogosultsagok->jogosultsagLetT = 0;
+
         if(Auth::check()){
             $jog = DB::table('users')->where('email', Auth::user()->email)->get();
             $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
@@ -255,19 +244,7 @@ class alkategoriakController extends Controller
         $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
         $fokategoriaNeve = $fokategoriaNeve[0]->nev;
         $path = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev.'/'.$fileName[0]->eredeti_fajlnev;
-        
-        //Jogosultság
-        $jogosultsagok = new Jogosultsagok;
-        $jogosultsagok->jogosultsagFelT = 0;
-        $jogosultsagok->jogosultsagLetT = 0;
-        if(Auth::check()){
-            $jog = DB::table('users')->where('email', Auth::user()->email)->get();
-            $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
-            $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
-        }
 
-        //AlKategoriak visszatöltése
-        require_once('alKBetolto.php');
 
         //Fájl törlése
         if(file_exists($path)){
@@ -292,27 +269,16 @@ class alkategoriakController extends Controller
         $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
         $fokategoriaNeve = $fokategoriaNeve[0]->nev;
 
-        //Jogosultság
-        $jogosultsagok = new Jogosultsagok;
-        $jogosultsagok->jogosultsagFelT = 0;
-        $jogosultsagok->jogosultsagLetT = 0;
-        if(Auth::check()){
-            $jog = DB::table('users')->where('email', Auth::user()->email)->get();
-            $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
-            $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
-        }
-        
-        //AlKategoriak visszatöltése
-        require_once('alKBetolto.php');
-
         //Validálás
         if(!isset($ujNev)){
-            return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategoria név!');;
+            return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategória név!');;
         }
 
-        if(!preg_match("/^[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $ujNev)){
+        if(!preg_match("/^[A-ZÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s\d_.,]+\d{1,}$/", $ujNev)){
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
+
+        require_once('alKBetolto.php');
 
         for ($i=0; $i < count($hozzaTartozoAlkategoriaNevek); $i++) {
             if($hozzaTartozoAlkategoriaNevek[$i]->nev == $ujNev){
@@ -335,25 +301,12 @@ class alkategoriakController extends Controller
             ]
         );
 
-        return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('uzenet', 'Alkategoria neve megváltozott!');;
+        return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('uzenet', 'Alkategória neve megváltozott!');;
     }
     
     public function alKtorles(Request $request){
         $foKategoria = $request->input('foKategoria');
         $alKategoria = $request->input('alKategoria');
-
-        //Jogosultság
-        $jogosultsagok = new Jogosultsagok;
-        $jogosultsagok->jogosultsagFelT = 0;
-        $jogosultsagok->jogosultsagLetT = 0;
-        if(Auth::check()){
-            $jog = DB::table('users')->where('email', Auth::user()->email)->get();
-            $jogosultsagok->jogosultsagFelT = $jog[0]->jogosultsagFelT;
-            $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
-        }
-        
-        //AlKategoriak visszatöltése
-        require_once('alKBetolto.php');
         
         $hozzaTartozoFilekIDs = DB::table('alkfajlkapocs_table')->where('AlK_id', $alKategoria)->select('Fajl_id')->get();
         $alKategoriaNev = DB::table('alkategoria_table')->where('id', $alKategoria)->select('nev')->get();
