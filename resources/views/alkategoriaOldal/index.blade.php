@@ -6,6 +6,7 @@
       <div class="row column text-center">
         <h1>Dokumentum Kezelő, Nexum</h1>
       </div>
+      
       @for($i = 0; $i < count($hozzaTartozoAlkategoriaNevek);$i++)
         <div class="buttonsDiv">
           <button type="button" 

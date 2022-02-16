@@ -35,7 +35,9 @@ class alkategoriakController extends Controller
         $fajl = $request->file('file');
         $foKategoria = $request->input('foKategoria');
         $alKategoria = $request->input('alKategoria');
-
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+        
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
         $jogosultsagok->jogosultsagFelT = 0;
@@ -61,7 +63,7 @@ class alkategoriakController extends Controller
         if($fajl){
             $fajlNev = $fajl->getClientOriginalName();
             $alKNev = DB::table('alkategoria_table')->select('alkategoria_table')->select('nev')->where('id',$alKategoria)->get();
-            $fajl->move(public_path('fajlok/'.$alKNev[0]->nev), $fajlNev);
+            $fajl->move(public_path('fajlok/'.$fokategoriaNeve.'/'.$alKNev[0]->nev), $fajlNev);
 
             if((strcmp(substr($fajlNev, -3), "txt") !== 0) &&
                (strcmp(substr($fajlNev, -3), "doc") !== 0) &&
@@ -135,6 +137,8 @@ class alkategoriakController extends Controller
 	public function ujAlKategoriaHozzadasa(Request $request){
         $nev = $request->input('nev');
         $foKategoria = $request->input('foKategoria');
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
 
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
@@ -154,7 +158,7 @@ class alkategoriakController extends Controller
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategoria név!');;
         }
 
-        if(!preg_match("/[A-Z]\w{1,}\d/", $nev)){
+        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $nev)){
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
@@ -172,8 +176,7 @@ class alkategoriakController extends Controller
             ]
         );
 
-        $AlK_id = DB::table('alkategoria_table')->select('id')->where('nev', $nev)->get();
-
+        $AlK_id = DB::table('alkategoria_table')->orderbydesc('id')->select('id')->where('nev', $nev)->get();
         DB::table('fo-alkategoriakapocs_table')->insert(
             [
                 'Fok_id' => intval($foKategoria),
@@ -184,7 +187,7 @@ class alkategoriakController extends Controller
         //Mappa létrehozása
         $alKategoriaNev = DB::table('alkategoria_table')->where('id', $AlK_id[0]->id)->select('nev')->get();
 
-        $path = public_path().'/'.'fajlok/'. $alKategoriaNev[0]->nev;
+        $path = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev;
         if(!file_exists($path)){
             File::makeDirectory($path);
         }
@@ -201,11 +204,12 @@ class alkategoriakController extends Controller
     }
 
     public function dokumentumokTable($foKategoria, $alKategoria){
-        $fajl_id = DB::table('alkfajlkapocs_table')->where('AlK_id', $alKategoria)->select('Fajl_id')->get();
-        $fajlok = DB::table('fajlok_table')->get();
-
         $alKategoriaNev = DB::table('alkategoria_table')->where('id',$alKategoria)->select('nev')->get();
         $alKategoriaNev = $alKategoriaNev[0]->nev;
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+        $fajlok = DB::table('fajlok_table')->get();
+
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
         $jogosultsagok->jogosultsagFelT = 0;
@@ -216,17 +220,28 @@ class alkategoriakController extends Controller
             $jogosultsagok->jogosultsagLetT = $jog[0]->jogosultsagLetT;
         }
 
-        $hozzaTartozoFileNevek = array();
+        require_once('alKBetolto.php');
+
+        $fajlok_id = array();
+
+        for ($i=0; $i < count($hozzaTartozoAlkategoriaNevek); $i++) { 
+            $aktualisID = DB::table('alkfajlkapocs_table')->where('AlK_id', $hozzaTartozoAlkategoriaNevek[$i]->id)->select('Fajl_id')->get();
+            if(isset($aktualisID[0]->Fajl_id)){
+                array_push($fajlok_id, $aktualisID[0]->Fajl_id);
+            }
+        }
+        
+        $hozzaTartozoFileNevek = array(); 
 
         for ($i=0; $i < count($fajlok); $i++) {
-            for ($j=0; $j < count($fajl_id); $j++) { 
-                if($fajlok[$i]->id == $fajl_id[$j]->Fajl_id){
+            for ($j=0; $j < count($fajlok_id); $j++) { 
+                if($fajlok[$i]->id == $fajlok_id[$j]){
                     array_push($hozzaTartozoFileNevek, $fajlok[$i]);
                 }
             }
         }
 
-        return view('alkategoriaOldal/modals/dokumentumokTable', compact('foKategoria', 'alKategoria','alKategoriaNev', 'hozzaTartozoFileNevek','jogosultsagok'));
+        return view('alkategoriaOldal/modals/dokumentumokTable', compact('foKategoria', 'alKategoria','alKategoriaNev', 'fokategoriaNeve','hozzaTartozoFileNevek','jogosultsagok'));
     }
 
     public function deleteFileTov($foKategoria,$alKategoria, $fileId){
@@ -242,8 +257,10 @@ class alkategoriakController extends Controller
         $fileId = $request->input('fileId');
         $alKategoriaNev = DB::table('alkategoria_table')->where('id', $alKategoria)->select('nev')->get();
         $fileName = DB::table('fajlok_table')->where('id', $fileId)->select('eredeti_fajlnev')->get();
-        $path = public_path().'/'.'fajlok/'.$alKategoriaNev[0]->nev.'/'.$fileName[0]->eredeti_fajlnev;
-
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+        $path = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev.'/'.$fileName[0]->eredeti_fajlnev;
+        
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
         $jogosultsagok->jogosultsagFelT = 0;
@@ -277,6 +294,8 @@ class alkategoriakController extends Controller
         $alKategoria = $request->input('alKategoria');
         $oldNev = DB::table('alkategoria_table')->where('id', $alKategoria)->select('nev')->get();
         $oldNev = $oldNev[0]->nev;
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
 
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
@@ -296,7 +315,7 @@ class alkategoriakController extends Controller
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Nincs megadva új alkategoria név!');;
         }
 
-        if(!preg_match("/[A-Z]\w{1,}\d/", $ujNev)){
+        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $ujNev)){
             return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
@@ -308,10 +327,10 @@ class alkategoriakController extends Controller
 
 
         //Alkategoriához tartozó mappa átnevezése
-        if(file_exists(public_path().'/'.'fajlok/'.$oldNev)){
-            rename(public_path().'/'.'fajlok/'.$oldNev, public_path().'/'.'fajlok/'.$ujNev);
+        if(file_exists(public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$oldNev)){
+            rename(public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$oldNev, public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$ujNev);
         }else{
-            return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Fájl nem található!');;
+            return \Redirect::to("alkategoriaOldal/index/".$foKategoria)->with('error', 'Sikertelen művelet! Hiba történt!');;
         }
 
         //Alkategoria adatbázisban való átnevezése
@@ -343,8 +362,10 @@ class alkategoriakController extends Controller
         
         $hozzaTartozoFilekIDs = DB::table('alkfajlkapocs_table')->where('AlK_id', $alKategoria)->select('Fajl_id')->get();
         $alKategoriaNev = DB::table('alkategoria_table')->where('id', $alKategoria)->select('nev')->get();
-        $pathFiles = public_path().'/'.'fajlok/'.$alKategoriaNev[0]->nev .'/*';
-        $path = public_path().'/'.'fajlok/'.$alKategoriaNev[0]->nev;
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
+        $pathFiles = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev .'/*';
+        $path = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev;
 
         //Fájl törlése a mappából
         if(file_exists($path)){

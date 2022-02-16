@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
+use File;
 
 class Jogosultsagok{
     public $jogosultsagFelT;
@@ -49,7 +50,7 @@ class foKategoriakController extends Controller
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Nincs megadva kategoria név!');;
         }
 
-        if(!preg_match("/[A-Z]\w{1,}\d/", $nev)){
+        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $nev)){
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
@@ -61,11 +62,18 @@ class foKategoriakController extends Controller
             }
         }
         
+        //Főkategória hozzáadása az adatbázishoz
         DB::table('fokategoriak_table')->insert(
             [
                 'nev' => $nev,
             ]
         );
+
+        //Mappa létrehozása
+        $path = public_path().'/'.'fajlok/'. $nev;
+        if(!file_exists($path)){
+            File::makeDirectory($path);
+        }
 
         return \Redirect::to("fooldal/index")->with('uzenet', 'Új fő kategoria sikeresen hozzá adva!');;
     }
@@ -78,6 +86,8 @@ class foKategoriakController extends Controller
         $ujNev = $request->input('nev');
         $foKategoriak = DB::table('fokategoriak_table')->get();
         $foKategoriaID = $request->input('foKategoria');
+        $oldNev = DB::table('fokategoriak_table')->where('id', $foKategoriaID)->select('nev')->get();
+        $oldNev = $oldNev[0]->nev;
 
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
@@ -94,23 +104,31 @@ class foKategoriakController extends Controller
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Nincs megadva új fő kategoria név!');;
         }
 
-        if(!preg_match("/[A-Z]\w{1,}\d/", $ujNev)){
+        if(!preg_match("/[A-Z-ÁÉÍÓÖŐÚÜŰ][A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű\s]+\d{1,}/", $ujNev)){
             return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Név nem megfelelő!');
         }
 
-        $hozzaTartozokategoriaNevek = DB::table('fokategoriak_table')->select('nev')->get();
+        $letezoKategoriaNevek = DB::table('fokategoriak_table')->select('nev')->get();
 
-        for ($i=0; $i < count($hozzaTartozokategoriaNevek); $i++) {
-            if($hozzaTartozokategoriaNevek[$i]->nev == $ujNev){
+        for ($i=0; $i < count($letezoKategoriaNevek); $i++) {
+            if($letezoKategoriaNevek[$i]->nev == $ujNev){
                 return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Név már létezik!');
             }
         }
 
+        //Főkategória nevének megváltoztatása az adatbázisban
         DB::table('fokategoriak_table')->where('id', $foKategoriaID)->update(
             [
                 'nev' => $ujNev,
             ]
         );
+
+        //Főkategóriához tartozó mappa nevének megváltoztatása
+         if(file_exists(public_path().'/'.'fajlok/'.$oldNev)){
+            rename(public_path().'/'.'fajlok/'.$oldNev, public_path().'/'.'fajlok/'.$ujNev);
+        }else{
+            return \Redirect::to("fooldal/index/")->with('error', 'Sikertelen művelet! Hiba történt!');;
+        }
 
         return \Redirect::to("fooldal/index")->with('uzenet', 'Főkategoria neve megváltozott!');;
     }
@@ -119,6 +137,8 @@ class foKategoriakController extends Controller
         $foKategoria = $request->input('foKategoria');
         $foKategoriak = DB::table('fokategoriak_table')->get();
         $alKategoria = DB::table('fo-alkategoriakapocs_table')->where('Fok_id', $foKategoria)->select('AlK_id')->get();
+        $fokategoriaNeve = DB::table('fokategoriak_table')->where('id',$foKategoria)->get();
+        $fokategoriaNeve = $fokategoriaNeve[0]->nev;
 
         //Jogosultság
         $jogosultsagok = new Jogosultsagok;
@@ -138,8 +158,8 @@ class foKategoriakController extends Controller
             $hozzaTartozoFilekIDs = DB::table('alkfajlkapocs_table')->where('AlK_id', $alKategoria[$i]->AlK_id)->get();
                         
             $alKategoriaNev = DB::table('alkategoria_table')->where('id', $alKategoria[$i]->AlK_id)->select('nev')->get();
-            $pathFiles = public_path().'/'.'fajlok/'.$alKategoriaNev[0]->nev .'/*';
-            $path = public_path().'/'.'fajlok/'.$alKategoriaNev[0]->nev;
+            $pathFiles = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev .'/*';
+            $path = public_path().'/'.'fajlok/'.$fokategoriaNeve.'/'.$alKategoriaNev[0]->nev;
 
             //Fájl törlése a mappából
                 if(file_exists($path)){
@@ -150,7 +170,7 @@ class foKategoriakController extends Controller
                         }
                     rmdir($path);
                 }else{
-                    return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Fájl nem található!');;
+                    return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Hiba történt!');;
                 }
 
             //Fájlok törlése az adatbázisból
@@ -163,6 +183,14 @@ class foKategoriakController extends Controller
             DB::table('alkategoria_table')->where('id', $alKategoria[$i]->AlK_id)->delete();
             DB::table('alkfajlkapocs_table')->where('AlK_id', $alKategoria[$i]->AlK_id)->delete();
             
+        }
+
+        $path = public_path().'/'.'fajlok/'.$fokategoriaNeve;
+        //Fokategoria mappájának törlése
+        if(file_exists($path)){
+            rmdir($path);
+        }else{
+            return \Redirect::to("fooldal/index")->with('error', 'Sikertelen művelet! Hiba történt!');
         }
 
         DB::table('fokategoriak_table')->where('id', $foKategoria)->delete();

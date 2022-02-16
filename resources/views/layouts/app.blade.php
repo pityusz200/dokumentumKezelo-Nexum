@@ -76,5 +76,8 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+	<script src="{{ asset('js/jquery-2.1.4.min.js') }}"></script>
+	<script src="{{ asset('js/foundation.js') }}"></script>
+	<script src="{{ asset('js/bootstrap.min.js') }}"></script>			
 </body>
 </html>

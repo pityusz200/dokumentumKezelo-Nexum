@@ -10,14 +10,14 @@
   </head>
   <body>
     <div class="top-bar">
-      <div class="top-bar-left">
+      <div class="top-bar-left center">
         <ul class="menu">
           <li class="menu-text"><a href="/home">dokumentumKezelo-Nexum</a></li>
             @if(Auth::check())
-                <li><a href="/logout">Kijelentkezés</a></li>
+                <a href="/logout">Kijelentkezés</a>
               @else
-                <li><a href="/register">Regisztráció</a></li>
-                <li><a href="/login">Bejelentkezés</a></li>
+                <a href="/register">Regisztráció</a> | 
+                <a href="/login">Bejelentkezés</a>
             @endif
         </ul>
       </div>
@@ -38,11 +38,10 @@
 
     @yield('tartalom')
     
-    <script src="js/jquery-2.1.4.min.js"></script>
-    <script src="js/foundation.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/app.min.js"></script>
-    <script>(document).foundation();</script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/jquery-2.1.4.min.js') }}"></script>
+    <script src="{{ asset('js/foundation.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
   <script>
@@ -72,34 +71,6 @@
         xmlhttp.open("GET", "/alkategoriaOldal/modals/deleteFile/"+{{$foKategoria}}+"/"+btn.name+"/"+btn.id, true);
         xmlhttp.send();
     }
-
-    function getText(text) {
-      console.log(text.value);
-      //Nagybetűvel kezdődik
-      const regexnBetu = new RegExp(/[A-Z]/);  
-      if(regexnBetu.test(text.value)){
-        document.getElementById('nBetu').style.color = "#1ab012";
-      }else{
-        document.getElementById('nBetu').style.color = "#b01212";
-      }
-
-      //Legalább 3 karakter
-      const regexmin3kar = new RegExp(/\w{3,}/);  
-      if(regexmin3kar.test(text.value)){
-        document.getElementById('min3kar').style.color = "#1ab012";
-      }else{
-        document.getElementById('min3kar').style.color = "#b01212";
-      }
-
-      //Számmal végződik
-      const regexszamK = new RegExp(/\w{1,}\d/);  
-      if(regexszamK.test(text.value)){
-        document.getElementById('szamK').style.color = "#1ab012";
-      }else{
-        document.getElementById('szamK').style.color = "#b01212";
-      }
-    }
   </script>
-
   </body>
 </html>

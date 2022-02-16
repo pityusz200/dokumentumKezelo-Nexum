@@ -26,7 +26,7 @@
             @if ($jogosultsagok->jogosultsagLetT == 1)
             <td>
                 <button type="button">
-                    <a href="/fajlok/{{$alKategoriaNev}}/{{$hozzaTartozoFileNevek[$i]->eredeti_fajlnev}}">
+                    <a href="/fajlok/{{$fokategoriaNeve}}/{{$alKategoriaNev}}/{{$hozzaTartozoFileNevek[$i]->eredeti_fajlnev}}">
                         <img src="/download.png" alt="Letöltés" class="download">
                     </a>
                 </button></td>
