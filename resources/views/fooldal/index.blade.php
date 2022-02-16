@@ -21,7 +21,7 @@
                   onclick="getData(this)"
                   id="{{$fokategoria->id}}" 
                   name="{{$fokategoria->nev}}">
-                  <img src="/pen.png" alt="Módosítás" class="editPen">
+                  <img src="/ikonok/pen.png" alt="Módosítás" class="editPen">
               </button>
             @endif
           @endif

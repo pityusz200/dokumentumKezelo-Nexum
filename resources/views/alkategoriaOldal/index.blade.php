@@ -1,4 +1,4 @@
-@extends('layouts.main_withAjax')
+@extends('layouts.main_alk')
 
 @section('tartalom')
 
@@ -28,7 +28,7 @@
                   onclick="getData(this)"
                   id="{{$hozzaTartozoAlkategoriaNevek[$i]->id}}" 
                   name="{{$hozzaTartozoAlkategoriaNevek[$i]->nev}}">
-                  <img src="/pen.png" alt="Módosítás" class="editPen">
+                  <img src="/ikonok/pen.png" alt="Módosítás" class="editPen">
               </button>
           </div>
         @endif

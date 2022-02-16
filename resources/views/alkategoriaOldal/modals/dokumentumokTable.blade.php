@@ -1,7 +1,6 @@
 <table>
     <tr>
-        <th>ID</th>
-        <th>Nev</th>
+        <th>Név</th>
         <th>Eredeti fájlnév</th>
         <th>Verziószám</th>
         <th>Feltöltés időpontja</th>
@@ -16,7 +15,6 @@
 
     @for ($i = 0; $i < count($hozzaTartozoFileNevek); $i++)
         <tr>
-            <td>{{$hozzaTartozoFileNevek[$i]->id}}</td>
             <td>{{$hozzaTartozoFileNevek[$i]->nev}}</td>
             <td>{{$hozzaTartozoFileNevek[$i]->eredeti_fajlnev}}</td>
             <td>{{$hozzaTartozoFileNevek[$i]->verzioszam}}</td>
@@ -27,7 +25,7 @@
             <td>
                 <button type="button">
                     <a href="/fajlok/{{$fokategoriaNeve}}/{{$alKategoriaNev}}/{{$hozzaTartozoFileNevek[$i]->eredeti_fajlnev}}">
-                        <img src="/download.png" alt="Letöltés" class="download">
+                        <img src="/ikonok/download.png" alt="Letöltés" class="download">
                     </a>
                 </button></td>
             @endif
@@ -40,7 +38,7 @@
                 data-bs-toggle="modal"
                 data-bs-target="#deletFile"
                 onclick="deleteFile(this)">
-                <img src="/kuka.png" alt="Törlés" class="deletTrash"></button></td>
+                <img src="/ikonok/kuka.png" alt="Törlés" class="deletTrash"></button></td>
             @endif
         </tr>
     @endfor
